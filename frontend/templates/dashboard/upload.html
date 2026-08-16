@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Certificate Upload{% endblock %}
+{% block content %}
+<section class="mb-4">
+  <div class="section-head d-flex justify-content-between align-items-center">
+    <h4>Upload Certificates</h4>
+    <div class="d-flex align-items-center gap-2">
+      <span class="chip chip-info">Single or Batch</span>
+      {% if chain_status.online %}
+        <span class="chip chip-ok">Blockchain connected: {{ chain_status.network }}</span>
+      {% else %}
+        <span class="chip chip-warn">Blockchain offline: {{ chain_status.network }}</span>
+      {% endif %}
+    </div>
+  </div>
+  <p class="text-muted mb-0">Upload university certificate files (PDF or image). The system extracts details, prepares verification records, and updates status.</p>
+</section>
+
+<div class="row g-4 mb-3">
+  <div class="col-lg-6">
+    <div class="portal-card p-4 h-100">
+      <h5 class="fw-bold mb-3">Single Upload</h5>
+      <form id="singleUploadForm" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label class="form-label">Certificate File</label>
+          <input class="form-control" type="file" name="pdf_file" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp" required />
+        </div>
+        <button class="btn btn-primary px-4" type="submit">Upload</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="portal-card p-4 h-100">
+      <h5 class="fw-bold mb-3">Batch Upload</h5>
+      <form id="batchUploadForm" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label class="form-label">Select Folder</label>
+          <input class="form-control" type="file" name="folder_files" webkitdirectory directory multiple />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Or Select Multiple Files</label>
+          <input class="form-control" type="file" name="files" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp" multiple />
+        </div>
+        <button class="btn btn-outline-dark px-4" type="submit">Upload Batch</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="uploadResult">
+  <div class="alert alert-secondary">Upload status and extracted details will appear here.</div>
+</div>
+{% endblock %}

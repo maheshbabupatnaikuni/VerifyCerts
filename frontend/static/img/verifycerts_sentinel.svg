@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" role="img" aria-label="VerifyCerts Sentinel">
+  <defs>
+    <radialGradient id="g1" cx="32%" cy="26%" r="72%">
+      <stop offset="0%" stop-color="#67e9ff"/>
+      <stop offset="35%" stop-color="#19a7df"/>
+      <stop offset="62%" stop-color="#114f9d"/>
+      <stop offset="100%" stop-color="#0b275e"/>
+    </radialGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#63f5ff"/>
+      <stop offset="100%" stop-color="#05d5ff"/>
+    </linearGradient>
+  </defs>
+  <rect x="46" y="18" width="48" height="10" rx="5" fill="#0b2a60"/>
+  <circle cx="70" cy="14" r="6" fill="#3ee7ff"/>
+  <rect x="20" y="28" width="100" height="92" rx="28" fill="url(#g1)" />
+  <rect x="8" y="52" width="16" height="44" rx="8" fill="#114f9d"/>
+  <rect x="116" y="52" width="16" height="44" rx="8" fill="#114f9d"/>
+  <rect x="38" y="64" width="64" height="18" rx="9" fill="url(#g2)" />
+  <rect x="52" y="92" width="36" height="6" rx="3" fill="#9ec0ff" opacity="0.95" />
+  <rect x="20" y="28" width="100" height="92" rx="28" fill="none" stroke="#d8f7ff" stroke-opacity="0.45" stroke-width="2"/>
+</svg>

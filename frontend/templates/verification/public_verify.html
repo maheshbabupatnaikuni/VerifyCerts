@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Certificate Verification Result{% endblock %}
+{% block main_class %}container-xxl py-4 py-lg-5 verify-result-shell{% endblock %}
+{% block content %}
+<div class="verify-result-card mb-4">
+  <div class="verify-status-band verify-status-{{ status|lower }} d-flex justify-content-between align-items-center">
+    <div>
+      <div class="small opacity-75">Certificate Verification</div>
+      <h2 class="h3 mb-0">{{ status }}</h2>
+    </div>
+    {% if certificate %}<strong>{{ certificate.certificate_id }}</strong>{% endif %}
+  </div>
+  <div class="p-4">
+    <p class="fw-semibold mb-3">{{ message }}</p>
+
+    {% if certificate %}
+      <div class="verify-section-card mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="h5 mb-0">Result</h5>
+          {% if status == "VALID" %}
+            <span class="badge-soft badge-ok">Trusted</span>
+          {% elif status == "NEEDS_REVIEW" %}
+            <span class="badge-soft">Under Review</span>
+          {% else %}
+            <span class="badge-soft badge-bad">Attention Required</span>
+          {% endif %}
+        </div>
+        <div class="row g-3">
+          <div class="col-md-3"><div class="meta-label">Result</div><div>{{ status }}</div></div>
+          <div class="col-md-3"><div class="meta-label">Verification Record</div><div>{% if proof.anchored_on_chain %}Available{% else %}Pending{% endif %}</div></div>
+          <div class="col-md-3"><div class="meta-label">Integrity Check</div><div>{% if proof.hash_match %}Passed{% elif proof.has_chain_hash %}Needs attention{% else %}Pending{% endif %}</div></div>
+          <div class="col-md-3"><div class="meta-label">Source</div><div>{{ proof.network }}</div></div>
+        </div>
+      </div>
+
+      <div class="verify-section-card mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h4 class="h4 mb-0">Student Details</h4>
+          {% if status == "VALID" %}<span class="badge-soft badge-ok">Valid Certificate</span>{% endif %}
+        </div>
+        <div class="row g-2">
+          <div class="col-md-6"><strong>Student Name:</strong> {{ certificate.student_name }}</div>
+          <div class="col-md-6"><strong>Registration Number:</strong> {{ certificate.registration_number }}</div>
+          <div class="col-md-6"><strong>Course:</strong> {{ certificate.course }}</div>
+          <div class="col-md-6"><strong>Department:</strong> {{ certificate.department }}</div>
+          <div class="col-md-6"><strong>Graduation Year:</strong> {{ certificate.graduation_year }}</div>
+          <div class="col-md-6"><strong>University:</strong> {{ certificate.university_name }}</div>
+        </div>
+        <div class="mt-3 d-flex gap-2 flex-wrap">
+          <a class="btn btn-outline-secondary btn-sm" href="/verify/report/{{ certificate.certificate_id }}/">Download Verification Report</a>
+          {% if certificate.qr_code %}<a class="btn btn-outline-secondary btn-sm" href="{{ certificate.qr_code.url }}" target="_blank">Open QR</a>{% endif %}
+          {% if proof.explorer_url %}
+            <a class="btn btn-outline-dark btn-sm" href="{{ proof.explorer_url }}" target="_blank">Open Transaction</a>
+          {% endif %}
+          {% if proof.contract_url %}
+            <a class="btn btn-outline-dark btn-sm" href="{{ proof.contract_url }}" target="_blank">Open Contract</a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="verify-section-card mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="h5 mb-0">Proof</h5>
+          {% if not proof.has_chain_hash %}
+            <span class="badge-soft">Pending record write</span>
+          {% elif proof.hash_match %}
+            <span class="badge-soft badge-ok">Data match confirmed</span>
+          {% else %}
+            <span class="badge-soft badge-bad">Data mismatch detected</span>
+          {% endif %}
+        </div>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="meta-label">Record Status</div>
+            {% if proof.hash_match %}
+              <span class="badge-soft badge-ok">Data Match Confirmed</span>
+            {% elif proof.has_chain_hash %}
+              <span class="badge-soft badge-bad">Mismatch Detected</span>
+            {% else %}
+              <span class="badge-soft">Awaiting Record</span>
+            {% endif %}
+          </div>
+          {% if proof.on_chain_proof_id and proof.on_chain_proof_id != "-" %}
+            <div class="col-md-4"><div class="meta-label">Proof ID</div><div class="text-break">{{ proof.on_chain_proof_id }}</div></div>
+          {% endif %}
+          {% if proof.contract_address and proof.contract_address != "-" %}
+            <div class="col-md-4"><div class="meta-label">Contract Address</div><div class="text-break">{{ proof.contract_address }}</div></div>
+          {% endif %}
+          <div class="col-md-6"><div class="meta-label">Local Hash</div><div class="text-break">{{ proof.local_hash }}</div></div>
+          <div class="col-md-6"><div class="meta-label">Chain Hash</div><div class="text-break">{{ proof.chain_hash }}</div></div>
+          {% if proof.tx_hash and proof.tx_hash != "-" %}
+            <div class="col-md-6"><div class="meta-label">Reference ID</div><div class="text-break">{{ proof.tx_hash }}</div></div>
+          {% endif %}
+          {% if proof.block_number and proof.block_number != "-" %}
+            <div class="col-md-3"><div class="meta-label">Block Number</div><div>{{ proof.block_number }}</div></div>
+          {% endif %}
+          {% if proof.recorded_at %}
+            <div class="col-md-3"><div class="meta-label">Recorded At</div><div>{{ proof.recorded_at }}</div></div>
+          {% endif %}
+        </div>
+      </div>
+
+      <details class="verify-section-card mb-3">
+        <summary class="h6 mb-0" style="cursor:pointer;">Show Details</summary>
+        <div class="mt-3">
+          <h6 class="mb-2">Process Timeline</h6>
+          <div class="row g-2">
+            {% for step in verification_timeline %}
+              <div class="col-md-6">
+                <div class="border rounded p-2 h-100">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong>{{ step.label }}</strong>
+                    {% if step.done %}
+                      <span class="badge-soft badge-ok">Done</span>
+                    {% else %}
+                      <span class="badge-soft">Pending</span>
+                    {% endif %}
+                  </div>
+                  <div class="small mt-1 text-muted">
+                    {% if step.time %}{{ step.time }}{% else %}-{% endif %}
+                    {% if step.message %}<br>{{ step.message }}{% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          {% if uploaded_check %}
+          <hr>
+          <h6 class="mb-2">Uploaded File Check</h6>
+          <div class="row g-2 small">
+            <div class="col-md-3"><strong>Core data matched:</strong> {% if uploaded_check.match_with_db_hash == "TRUE" %}Yes{% else %}No{% endif %}</div>
+            <div class="col-md-3"><strong>Exact file matched:</strong> {% if uploaded_check.exact_source_match == "TRUE" %}Yes{% else %}No{% endif %}</div>
+            <div class="col-md-3"><strong>Identity matched:</strong> {% if uploaded_check.semantic_match == "TRUE" %}Yes{% else %}No{% endif %}</div>
+            {% if uploaded_check.detected_certificate_id and uploaded_check.detected_certificate_id != "-" %}
+              <div class="col-md-3"><strong>Detected Certificate ID:</strong> {{ uploaded_check.detected_certificate_id }}</div>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </details>
+
+      <div class="verify-section-card">
+        <h5 class="h5 mb-2">Check Another File</h5>
+        <form method="post" action="/verify/upload-pdf/" enctype="multipart/form-data" class="d-flex gap-2 flex-wrap">
+          {% csrf_token %}
+          <input class="form-control" type="file" name="pdf_file" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp" required style="max-width:520px;" />
+          <button class="btn btn-primary btn-sm" type="submit">Upload and Verify</button>
+        </form>
+      </div>
+    {% else %}
+      <div class="alert alert-warning mb-0">
+        No matching certificate record found.
+        {% if uploaded_preview %}
+          <hr>
+          {% if uploaded_preview.detected_certificate_id and uploaded_preview.detected_certificate_id != "-" %}
+            <div class="small">Detected Certificate ID: {{ uploaded_preview.detected_certificate_id }}</div>
+          {% endif %}
+          {% if uploaded_preview.student_name and uploaded_preview.student_name != "-" %}
+            <div class="small">Detected Student: {{ uploaded_preview.student_name }}</div>
+          {% endif %}
+          {% if uploaded_preview.registration_number and uploaded_preview.registration_number != "-" %}
+            <div class="small">Detected Registration Number: {{ uploaded_preview.registration_number }}</div>
+          {% endif %}
+          {% if uploaded_preview.course and uploaded_preview.course != "-" %}
+            <div class="small">Detected Course: {{ uploaded_preview.course }}</div>
+          {% endif %}
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

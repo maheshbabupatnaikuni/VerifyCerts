@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Blockchain Transactions{% endblock %}
+{% block content %}
+<div class="section-head d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <h4>Blockchain Records</h4>
+  <span class="chip chip-info">Confirmed chain transactions</span>
+</div>
+<p class="text-muted mb-3">Verified transaction records used for certificate proof checks.</p>
+
+<div class="portal-card p-0 overflow-hidden">
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Certificate</th><th>Transaction</th><th>Block</th><th>Status</th><th>Time</th></tr></thead>
+      <tbody>
+      {% for record in records %}
+        <tr>
+          <td>{{ record.certificate_id }}</td>
+          <td class="text-break">{{ record.transaction_hash }}</td>
+          <td>{{ record.block_number }}</td>
+          <td>{{ record.status }}</td>
+          <td>{{ record.timestamp }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="text-center py-4">No records</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

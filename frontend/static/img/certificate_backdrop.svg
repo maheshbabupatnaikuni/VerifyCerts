@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Certificate verification network</title>
+  <desc id="desc">Abstract blue security network with a certificate and verification mark.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07152f"/>
+      <stop offset="0.55" stop-color="#123e78"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#67e8f9" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#67e8f9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1240" cy="180" r="420" fill="url(#glow)"/>
+  <g fill="none" stroke="#93c5fd" stroke-opacity=".22" stroke-width="2">
+    <path d="M0 690L330 460 650 640 970 330 1280 540 1600 260"/>
+    <path d="M0 250L310 370 590 170 940 510 1260 290 1600 470"/>
+  </g>
+  <g transform="translate(1010 250)">
+    <rect width="360" height="430" rx="28" fill="#fff" fill-opacity=".93"/>
+    <rect x="42" y="54" width="210" height="18" rx="9" fill="#1d4ed8"/>
+    <rect x="42" y="100" width="275" height="12" rx="6" fill="#94a3b8"/>
+    <rect x="42" y="132" width="240" height="12" rx="6" fill="#cbd5e1"/>
+    <circle cx="180" cy="270" r="82" fill="#dcfce7"/>
+    <path d="M138 270l29 29 58-65" fill="none" stroke="#15803d" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="120" y="210" fill="#fff" font-family="Arial,sans-serif" font-size="76" font-weight="700">VerifyCerts</text>
+  <text x="124" y="278" fill="#bae6fd" font-family="Arial,sans-serif" font-size="30">Certificate authenticity with verifiable evidence</text>
+</svg>

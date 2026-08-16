@@ -1,0 +1,129 @@
+{
+	"compiler": {
+		"version": "0.8.30+commit.73712a01"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "string",
+						"name": "certificateId",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "hashValue",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "issuer",
+						"type": "address"
+					}
+				],
+				"name": "CertificateStored",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "certificateId",
+						"type": "string"
+					}
+				],
+				"name": "getCertificate",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "hashValue",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "issuer",
+						"type": "address"
+					},
+					{
+						"internalType": "bool",
+						"name": "exists",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "certificateId",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "hashValue",
+						"type": "string"
+					}
+				],
+				"name": "storeCertificate",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/CertificateRegistry.sol": "CertificateRegistry"
+		},
+		"evmVersion": "prague",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/CertificateRegistry.sol": {
+			"keccak256": "0xe5ffd7078363556fcadda76555318c6bce9eacc40a28671b45373b8ac5300d69",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://02026b3c9fe3cabaa4732e95c73078806092e17493eb1166fecd517e467a8626",
+				"dweb:/ipfs/QmRwWFawMYw5rsmMkdYhaLYQV4rVYhb1u9nMbEWu34xVzE"
+			]
+		}
+	},
+	"version": 1
+}

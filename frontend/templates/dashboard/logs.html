@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Verification Logs{% endblock %}
+{% block content %}
+<div class="section-head d-flex justify-content-between align-items-center flex-wrap gap-2">
+  <h4>Verification Logs</h4>
+  <span class="chip chip-info">Recent employer verification attempts</span>
+</div>
+<p class="text-muted mb-3">Audit view of verification activity for transparency and traceability.</p>
+<div class="small text-muted mb-2">Auto-refreshes every 20 seconds for synced activity tracking.</div>
+
+<div class="portal-card p-0 overflow-hidden">
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Certificate</th><th>Verifier IP</th><th>Time</th><th>Result</th></tr></thead>
+      <tbody>
+      {% for log in logs %}
+        <tr><td>{{ log.certificate.certificate_id }}</td><td>{{ log.verifier_ip }}</td><td>{{ log.verification_time }}</td><td>{{ log.result }}</td></tr>
+      {% empty %}
+        <tr><td colspan="4" class="text-center py-4">No logs</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section-head d-flex justify-content-between align-items-center flex-wrap gap-2 mt-4">
+  <h5 class="mb-0">Recent Admin Actions</h5>
+  <span class="chip chip-info">Every admin action is tracked</span>
+</div>
+<div class="portal-card p-0 overflow-hidden">
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Time</th><th>Certificate</th><th>Action</th><th>Message</th></tr></thead>
+      <tbody>
+      {% for ev in admin_actions %}
+        <tr>
+          <td>{{ ev.created_at|date:"M d, Y h:i a" }}</td>
+          <td>{{ ev.certificate.certificate_id }}</td>
+          <td>{{ ev.event_type }}</td>
+          <td>{{ ev.message|default:"-" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4" class="text-center py-4">No admin actions yet</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+  setTimeout(() => window.location.reload(), 20000);
+</script>
+{% endblock %}

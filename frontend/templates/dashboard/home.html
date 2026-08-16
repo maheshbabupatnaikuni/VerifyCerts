@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}VerifyCerts Portal{% endblock %}
+{% block content %}
+{% if not request.user.is_authenticated %}
+  <section class="landing-hero mb-4 reveal" style="--landing-hero-bg:url('{% if branding and branding.homepage_background %}{{ branding.homepage_background.url }}{% else %}{% static 'img/certificate_backdrop.svg' %}{% endif %}');">
+    <div class="landing-copy">
+      <h1>Trust Every Certificate You Verify.</h1>
+      <p>A premium verification experience for institutions, students, and employers. Fast checks, clear evidence, and confident decisions.</p>
+      <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-light btn-lg px-4 hover-lift" href="#verify-section">Start Verification</a>
+        <a class="btn btn-outline-light btn-lg px-4 hover-lift" href="/accounts/login/">Admin Login</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="verify-section" class="landing-verify-panel portal-card p-4 p-lg-5 mb-5 reveal">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+      <h2 class="h2 mb-0 fw-bold">Verify Certificates</h2>
+      <span class="chip chip-info">No login required</span>
+    </div>
+    <p class="text-muted mb-4">Choose any method: Certificate ID, QR scan, or direct file upload.</p>
+
+    <div class="row g-4 mb-3">
+      <div class="col-lg-6">
+        <h6 class="fw-semibold mb-2">Verify by Certificate ID</h6>
+        <form method="get" action="/verify/" class="d-flex gap-2">
+          <input class="form-control" type="text" name="certificate_id" placeholder="Example: EXU-2026-CSE-000123" required />
+          <button class="btn btn-primary px-4" type="submit">Verify</button>
+        </form>
+      </div>
+      <div class="col-lg-6">
+        <h6 class="fw-semibold mb-2">Verify by QR Scan</h6>
+        <div id="homeScanner" class="scan-box"></div>
+        <div class="mt-2 d-flex gap-2">
+          <button id="homeStartScan" class="btn btn-outline-primary btn-sm" type="button">Start Camera</button>
+          <button id="homeStopScan" class="btn btn-outline-secondary btn-sm" type="button">Stop</button>
+        </div>
+        <div id="homeScanHint" class="small text-muted mt-2">Tap start camera and point to certificate QR.</div>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-lg-8">
+        <h6 class="fw-semibold mb-2">Verify by Direct File Upload</h6>
+        <form method="post" action="/verify/upload-pdf/" enctype="multipart/form-data" class="d-flex gap-2 flex-wrap">
+          {% csrf_token %}
+          <input class="form-control" type="file" name="pdf_file" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp" required style="max-width:560px;" />
+          <button class="btn btn-outline-dark" type="submit">Upload File & Verify</button>
+        </form>
+        <div class="small text-muted mt-2">Upload certificate PDF or image. The system auto-detects and verifies against trusted records.</div>
+      </div>
+      <div class="col-lg-4">
+        <div class="feature-box hover-lift">
+          <h6 class="fw-semibold mb-1">Trusted Decision in Seconds</h6>
+          <p class="small text-muted mb-0">Get clear result with evidence panel, timeline, and authenticity status.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="row g-4 spacious-section reveal">
+    <div class="col-lg-7">
+      <div class="product-gallery hover-lift" style="height: 420px;" id="productGallery">
+        <div class="gallery-slide active">
+          <img src="{% if branding and branding.homepage_background %}{{ branding.homepage_background.url }}{% else %}{% static 'img/certificate_backdrop.svg' %}{% endif %}" alt="Certificate verification network" style="width:100%;height:100%;object-fit:cover;">
+          <div class="gallery-overlay"></div>
+          <div class="gallery-content">
+            <h4 class="fw-bold mb-1">Institution Grade Verification</h4>
+            <p class="mb-0">Built to support official certificate checks with clarity and confidence.</p>
+          </div>
+        </div>
+        <div class="gallery-slide" style="background:linear-gradient(145deg,#0f172a,#1d4ed8 58%,#22d3ee);">
+          <div class="gallery-overlay" style="background:linear-gradient(120deg,rgba(4,9,20,.35),rgba(4,9,20,.08));"></div>
+          <div class="gallery-content">
+            <h4 class="fw-bold mb-1">Transparent Verification Timeline</h4>
+            <p class="mb-0">Every major action is traceable from upload to final result.</p>
+          </div>
+        </div>
+        <div class="gallery-slide" style="background:linear-gradient(145deg,#052e2b,#0f766e 55%,#6ee7b7);">
+          <div class="gallery-overlay" style="background:linear-gradient(120deg,rgba(1,7,11,.38),rgba(1,7,11,.1));"></div>
+          <div class="gallery-content">
+            <h4 class="fw-bold mb-1">Reliable Records, Real Confidence</h4>
+            <p class="mb-0">Consistency checks ensure strong confidence before final validation.</p>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-dot-wrap mt-2" id="galleryDots">
+        <span class="gallery-dot active"></span>
+        <span class="gallery-dot"></span>
+        <span class="gallery-dot"></span>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="portal-card p-4 h-100 hover-lift">
+        <h3 class="h4 fw-bold mb-3">How the System Works</h3>
+        <div class="row g-2">
+          <div class="col-12">
+            <div class="how-step">
+              <div class="num">1</div>
+              <div class="fw-semibold">Upload</div>
+              <div class="small text-muted">Authorized staff uploads original certificate PDF.</div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="how-step">
+              <div class="num">2</div>
+              <div class="fw-semibold">Inspect</div>
+              <div class="small text-muted">System reads details and flags anything that needs review.</div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="how-step">
+              <div class="num">3</div>
+              <div class="fw-semibold">Trust Record</div>
+              <div class="small text-muted">A secure trust record is created to support future verification.</div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="how-step">
+              <div class="num">4</div>
+              <div class="fw-semibold">Verify Anywhere</div>
+              <div class="small text-muted">Employers verify by ID, QR, or PDF and get instant result.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="row g-3 mb-4 reveal">
+    <div class="col-md-4"><div class="feature-box hover-lift"><h6 class="fw-semibold">Authenticity First</h6><p class="small text-muted mb-0">Strong consistency checks improve trust in every result.</p></div></div>
+    <div class="col-md-4"><div class="feature-box hover-lift"><h6 class="fw-semibold">Professional Operations</h6><p class="small text-muted mb-0">Designed for institutional workflows, review, and audit readiness.</p></div></div>
+    <div class="col-md-4"><div class="feature-box hover-lift"><h6 class="fw-semibold">Mobile Ready</h6><p class="small text-muted mb-0">Responsive interface for desktop, tablet, and smartphone users.</p></div></div>
+  </section>
+{% else %}
+  <section class="mb-4 reveal">
+    <div class="section-head d-flex justify-content-between align-items-center">
+      <h4>Admin Overview</h4>
+      <span class="chip chip-info">Professional Workspace</span>
+    </div>
+    <p class="text-muted mb-3">Monitor daily operations, review data quality, and track verification activity.</p>
+    <div class="row g-3">
+      <div class="col-6 col-lg-3"><div class="card stat-card hover-lift"><div class="card-body"><h6 class="text-muted">Total Certificates</h6><h3>{{ cert_count }}</h3></div></div></div>
+      <div class="col-6 col-lg-3"><div class="card stat-card hover-lift"><div class="card-body"><h6 class="text-muted">Active</h6><h3>{{ active_count }}</h3></div></div></div>
+      <div class="col-6 col-lg-3"><div class="card stat-card hover-lift"><div class="card-body"><h6 class="text-muted">Needs Review</h6><h3>{{ review_count }}</h3></div></div></div>
+      <div class="col-6 col-lg-3"><div class="card stat-card hover-lift"><div class="card-body"><h6 class="text-muted">Total Verifications</h6><h3>{{ verification_count }}</h3></div></div></div>
+    </div>
+    <div class="small text-muted mt-2">Auto-refreshes every 30 seconds for synced dashboard counts.</div>
+  </section>
+
+  <section class="portal-card p-4 reveal">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold mb-0">Latest Certificates</h5>
+      <a class="btn btn-sm btn-outline-dark" href="/dashboard/search/">View all</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table mb-0">
+        <thead><tr><th>ID</th><th>Name</th><th>Reg No</th><th>Status</th><th>Created</th></tr></thead>
+        <tbody>
+          {% for cert in latest_certificates %}
+            <tr>
+              <td>{{ cert.certificate_id }}</td>
+              <td>{{ cert.student_name }}</td>
+              <td>{{ cert.registration_number }}</td>
+              <td>{{ cert.status }}</td>
+              <td>{{ cert.created_at|date:"M d, Y h:i a" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="text-center text-muted py-4">No certificates yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% if request.user.is_authenticated %}
+  <script>
+    setTimeout(() => window.location.reload(), 30000);
+  </script>
+{% endif %}
+{% if not request.user.is_authenticated %}
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script>
+    (() => {
+      const scannerEl = document.getElementById("homeScanner");
+      const startBtn = document.getElementById("homeStartScan");
+      const stopBtn = document.getElementById("homeStopScan");
+      const hint = document.getElementById("homeScanHint");
+
+      if (scannerEl && window.Html5Qrcode && startBtn && stopBtn && hint) {
+        let scanner = null;
+        let scanning = false;
+
+        function extractId(text) {
+          if (!text) return null;
+          const clean = text.trim();
+          try {
+            const url = new URL(clean);
+            const parts = url.pathname.split("/").filter(Boolean);
+            if (parts.length >= 2 && parts[0] === "verify") return parts[1];
+          } catch (_err) {}
+          const m = clean.match(/[A-Z0-9]+-\d{4}-[A-Z0-9]+-\d{3,}/i);
+          return m ? m[0] : null;
+        }
+
+        function onScan(decodedText) {
+          const certId = extractId(decodedText);
+          if (!certId) {
+            hint.textContent = "QR read, but certificate ID not found.";
+            return;
+          }
+          window.location.href = `/verify/${encodeURIComponent(certId)}/`;
+        }
+
+        startBtn.addEventListener("click", async () => {
+          if (scanning) return;
+          scanner = new Html5Qrcode("homeScanner");
+          try {
+            await scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 220, height: 220 } }, onScan);
+            scanning = true;
+            hint.textContent = "Camera started. Point to certificate QR.";
+          } catch (err) {
+            hint.textContent = "Camera access failed. Please allow permission or use ID/PDF option.";
+          }
+        });
+
+        stopBtn.addEventListener("click", async () => {
+          if (!scanner || !scanning) return;
+          await scanner.stop();
+          await scanner.clear();
+          scanning = false;
+          hint.textContent = "Scanner stopped.";
+        });
+      }
+
+      const gallery = document.getElementById("productGallery");
+      const dotsWrap = document.getElementById("galleryDots");
+      if (gallery && dotsWrap) {
+        const slides = Array.from(gallery.querySelectorAll(".gallery-slide"));
+        const dots = Array.from(dotsWrap.querySelectorAll(".gallery-dot"));
+        if (slides.length > 1) {
+          let idx = 0;
+          setInterval(() => {
+            slides[idx].classList.remove("active");
+            dots[idx].classList.remove("active");
+            idx = (idx + 1) % slides.length;
+            slides[idx].classList.add("active");
+            dots[idx].classList.add("active");
+          }, 3600);
+        }
+      }
+    })();
+  </script>
+{% endif %}
+{% endblock %}

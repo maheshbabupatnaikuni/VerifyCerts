@@ -1,0 +1,31 @@
+{
+  "name": "VerifyCerts",
+  "build": { "dockerfile": "Dockerfile" },
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": {
+      "label": "VerifyCerts",
+      "onAutoForward": "openBrowser",
+      "visibility": "private"
+    }
+  },
+  "containerEnv": {
+    "DJANGO_SECRET_KEY": "test-only-codespace-secret-key",
+    "DJANGO_DEBUG": "True",
+    "DJANGO_ALLOWED_HOSTS": "*",
+    "CSRF_TRUSTED_ORIGINS": "https://*.app.github.dev,http://127.0.0.1:8000,http://localhost:8000",
+    "SUPER_ADMIN_USERNAME": "admin",
+    "SUPER_ADMIN_PASSWORD": "test-only-codespace123",
+    "SUPER_ADMIN_EMAIL": "admin@example.edu",
+    "EMAIL_BACKEND": "django.core.mail.backends.console.EmailBackend",
+    "TESSERACT_CMD": "tesseract",
+    "PYTHONUNBUFFERED": "1"
+  },
+  "postCreateCommand": "python -m pip install --upgrade pip && python -m pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py ensure_super_admin",
+  "postStartCommand": "bash -lc 'nohup bash .devcontainer/start.sh > runtime/codespaces.log 2>&1 &'",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python", "ms-python.debugpy"]
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Review Certificates{% endblock %}
+{% block content %}
+<div class="section-head d-flex justify-content-between align-items-center mb-3">
+  <h4>Certificates Pending Review</h4>
+  <span class="chip chip-warn">{{ certificates|length }} pending</span>
+</div>
+<p class="text-muted mb-3">Review extracted details, correct any errors, and approve records for publishing.</p>
+<div class="alert alert-warning py-2">Pending certificates need your approval</div>
+
+{% if certificates %}
+  <div class="portal-card mb-3 p-3">
+    <form id="bulkApproveForm" method="post" class="d-flex gap-2 align-items-center flex-wrap">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="bulk_approve" />
+      <button class="btn btn-success btn-sm" type="submit" onclick="return confirm('Approve selected certificates in bulk?');">
+        Bulk Approve Selected
+      </button>
+      <span class="small text-muted">Select records below and approve in one step.</span>
+    </form>
+  </div>
+  {% for row in cert_rows %}
+    {% with cert=row.cert %}
+    <div class="portal-card mb-3 overflow-hidden fade-in">
+      <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light-subtle">
+        <div class="d-flex align-items-center gap-2">
+          <input type="checkbox" form="bulkApproveForm" name="selected_ids" value="{{ cert.certificate_id }}" class="form-check-input" />
+          <strong>{{ cert.certificate_id }}</strong>
+        </div>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+          {% if cert.extracted_data.duplicate_candidates %}
+            <span class="chip chip-warn">Possible Duplicate</span>
+          {% endif %}
+          {% if row.email_status.last_status == "sent" %}
+            <span class="chip chip-ok">Email Sent</span>
+          {% elif row.email_status.last_status == "failed" %}
+            <span class="chip chip-warn">Email Failed</span>
+          {% else %}
+            <span class="chip chip-muted">Email Unknown</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="p-3">
+        {% if cert.extracted_data.ingestion_meta %}
+          <div class="small text-muted mb-2">
+            Source: {{ cert.extracted_data.ingestion_meta.source_kind|default:"unknown" }} |
+            Pages: {{ cert.extracted_data.ingestion_meta.estimated_pages|default:"-" }}
+          </div>
+        {% endif %}
+        {% if cert.extracted_data.duplicate_candidates %}
+          <div class="alert alert-warning py-2 small">
+            <strong>Duplicate candidates:</strong> {{ cert.extracted_data.duplicate_candidates|join:", " }}
+          </div>
+        {% endif %}
+        <form method="post" class="row g-2">{% csrf_token %}
+          <input type="hidden" name="certificate_id" value="{{ cert.certificate_id }}" />
+
+          <div class="col-md-4">
+            <label class="form-label">Student Name</label>
+            <input class="form-control form-control-sm" name="student_name" value="{{ cert.student_name }}" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Registration Number</label>
+            <input class="form-control form-control-sm" name="registration_number" value="{{ cert.registration_number }}" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Course</label>
+            <input class="form-control form-control-sm" name="course" value="{{ cert.course }}" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Department</label>
+            <input class="form-control form-control-sm" name="department" value="{{ cert.department }}" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">University Name</label>
+            <input class="form-control form-control-sm" name="university_name" value="{{ cert.university_name }}" />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Graduation Year</label>
+            <input class="form-control form-control-sm" name="graduation_year" type="number" value="{{ cert.graduation_year }}" />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Issue Date</label>
+            <input class="form-control form-control-sm" name="issue_date" type="date" value="{% if cert.issue_date %}{{ cert.issue_date|date:'Y-m-d' }}{% endif %}" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Send To Email (optional)</label>
+            <input class="form-control form-control-sm" name="target_email" type="email" placeholder="{{ cert.registration_number }}@example.edu" />
+          </div>
+
+          <div class="col-12 d-flex gap-2 mt-2 flex-wrap">
+            <button class="btn btn-outline-dark btn-sm" type="submit" name="action" value="reprocess">Re-scan Data</button>
+            <button class="btn btn-outline-primary btn-sm" type="submit" name="action" value="save">Save</button>
+            <button class="btn btn-success btn-sm" type="submit" name="action" value="approve">Approve & Publish</button>
+            <button class="btn btn-danger btn-sm" type="submit" name="action" value="reject" onclick="return confirm('Reject and revoke this certificate?');">Reject</button>
+            <button class="btn btn-outline-warning btn-sm" type="submit" name="action" value="resend_email">Resend Email</button>
+            <a class="btn btn-outline-secondary btn-sm" href="{{ cert.pdf_file.url }}" target="_blank">Open PDF</a>
+            {% if cert.qr_code %}<a class="btn btn-outline-secondary btn-sm" href="{{ cert.qr_code.url }}" target="_blank">QR</a>{% endif %}
+          </div>
+        </form>
+
+        {% if cert.extracted_data.confidence_warnings %}
+          <div class="mt-2">
+            <small class="text-muted">Warnings:</small>
+            <ul class="mb-0">
+              {% for w in cert.extracted_data.confidence_warnings %}
+                <li><small>{{ w }}</small></li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+        <div class="small text-muted mt-2">
+          Last email: {{ row.email_status.last_recipient }}{% if row.email_status.last_at %} at {{ row.email_status.last_at }}{% endif %}
+          {% if row.email_status.retry_count %}| Retry failures: {{ row.email_status.retry_count }}{% endif %}
+        </div>
+      </div>
+    </div>
+    {% endwith %}
+  {% endfor %}
+{% else %}
+  <div class="alert alert-success">No certificates pending review.</div>
+{% endif %}
+{% endblock %}

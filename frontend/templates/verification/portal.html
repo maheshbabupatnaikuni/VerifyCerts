@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Verify Certificates{% endblock %}
+{% block content %}
+<section class="verify-hero reveal" style="--verify-hero-bg:url('{% if branding and branding.homepage_background %}{{ branding.homepage_background.url }}{% else %}{% static 'img/certificate_backdrop.svg' %}{% endif %}');">
+  <h2 class="display-6 fw-bold mb-2">Public Certificate Verification</h2>
+  <p class="mb-0">Verify by Certificate ID, QR scan, or direct file upload.</p>
+</section>
+
+<section class="verify-panel p-4 reveal">
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <h5 class="fw-semibold">Verify by Certificate ID</h5>
+      <form method="post" class="d-flex gap-2">{% csrf_token %}
+        <input class="form-control" type="text" name="certificate_id" placeholder="Example: EXU-2026-CSE-000123" required />
+        <button class="btn btn-primary" type="submit">Verify</button>
+      </form>
+    </div>
+    <div class="col-lg-6">
+      <h5 class="fw-semibold">Verify by QR Scan</h5>
+      <div id="scanner" class="scan-box"></div>
+      <div class="mt-2 d-flex gap-2">
+        <button id="startScan" class="btn btn-outline-primary btn-sm" type="button">Start Camera</button>
+        <button id="stopScan" class="btn btn-outline-secondary btn-sm" type="button">Stop</button>
+      </div>
+      <div id="scanHint" class="small text-muted mt-2">Tap start and point camera to certificate QR.</div>
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <h5 class="fw-semibold">Verify by Direct File Upload</h5>
+  <form method="post" action="/verify/upload-pdf/" enctype="multipart/form-data" class="d-flex gap-2 flex-wrap">{% csrf_token %}
+    <input class="form-control" type="file" name="pdf_file" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp" required style="max-width:560px;" />
+    <button class="btn btn-outline-dark" type="submit">Upload File and Verify</button>
+  </form>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+  (() => {
+    const scannerEl = document.getElementById("scanner");
+    const startBtn = document.getElementById("startScan");
+    const stopBtn = document.getElementById("stopScan");
+    const hint = document.getElementById("scanHint");
+    if (!scannerEl || !window.Html5Qrcode || !startBtn || !stopBtn || !hint) return;
+
+    let scanner = null;
+    let scanning = false;
+
+    function extractId(text) {
+      if (!text) return null;
+      const clean = text.trim();
+      try {
+        const url = new URL(clean);
+        const parts = url.pathname.split("/").filter(Boolean);
+        if (parts.length >= 2 && parts[0] === "verify") return parts[1];
+      } catch (_e) {}
+      const m = clean.match(/[A-Z0-9]+-\d{4}-[A-Z0-9]+-\d{3,}/i);
+      return m ? m[0] : null;
+    }
+
+    function onScan(decodedText) {
+      const certId = extractId(decodedText);
+      if (!certId) {
+        hint.textContent = "QR read, but certificate ID not found.";
+        return;
+      }
+      window.location.href = `/verify/${encodeURIComponent(certId)}/`;
+    }
+
+    startBtn.addEventListener("click", async () => {
+      if (scanning) return;
+      scanner = new Html5Qrcode("scanner");
+      try {
+        await scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 230, height: 230 } }, onScan);
+        scanning = true;
+        hint.textContent = "Camera started. Scan the QR.";
+      } catch (_err) {
+        hint.textContent = "Camera access failed. Allow permission or use ID/PDF options.";
+      }
+    });
+
+    stopBtn.addEventListener("click", async () => {
+      if (!scanner || !scanning) return;
+      await scanner.stop();
+      await scanner.clear();
+      scanning = false;
+      hint.textContent = "Scanner stopped.";
+    });
+  })();
+</script>
+{% endblock %}

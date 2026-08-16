@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Certificate Verification{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="icon" href="{% static 'img/verifycerts_sentinel.svg' %}" type="image/svg+xml">
+  <link href="{% static 'css/main.css' %}?v=apple2" rel="stylesheet">
+  <style>
+    :root { --brand-primary: {{ branding.primary_color|default:'#1f6feb' }}; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar navbar-expand-lg py-3">
+      <div class="container-xxl">
+        <a class="navbar-brand mb-0 portal-brand" href="/">VerifyCerts</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMain">
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+            {% if not request.user.is_authenticated %}
+              <li class="nav-item"><a class="nav-link" href="/#verify-section">Verify</a></li>
+              <li class="nav-item"><a class="btn btn-dark btn-sm px-3 mt-2 mt-lg-0" href="/accounts/login/">Login</a></li>
+            {% endif %}
+            {% if request.user.is_authenticated and request.user.is_staff %}
+              <li class="nav-item"><a class="nav-link" href="/dashboard/review/">Review</a></li>
+              <li class="nav-item"><a class="nav-link" href="/dashboard/upload/">Upload</a></li>
+              <li class="nav-item"><a class="nav-link" href="/dashboard/search/">Search</a></li>
+              <li class="nav-item"><a class="nav-link" href="/dashboard/logs/">Logs</a></li>
+              <li class="nav-item"><a class="nav-link" href="/dashboard/blockchain/">Records</a></li>
+              <li class="nav-item ms-lg-2">
+                <form method="post" action="/logout-now/" class="m-0">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-dark btn-sm px-3">Logout</button>
+                </form>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="{% block main_class %}container-xxl py-4 py-lg-5{% endblock %}">
+    {% if messages %}
+      <div class="mb-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'info' }} py-2 mb-2">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'js/dashboard.v2.js' %}?v=apple2"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

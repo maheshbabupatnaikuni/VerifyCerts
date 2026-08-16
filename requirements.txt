@@ -1,0 +1,29 @@
+# Core web framework
+Django==5.1.6  # Main backend framework: routing, models, auth, admin views.
+
+# REST APIs
+djangorestframework==3.15.2  # API layer for upload, verify, logs, dashboard endpoints.
+djangorestframework-simplejwt==5.4.0  # Token-based auth for protected API usage.
+
+# Database driver (used when PostgreSQL is enabled in .env)
+psycopg2-binary==2.9.10  # PostgreSQL connector.
+
+# File/image handling
+pillow==11.1.0  # Image processing support (QR/image artifacts).
+pytesseract==0.3.13  # OCR wrapper used to extract text from certificates.
+opencv-python-headless==4.11.0.86  # Image pre-processing before OCR for better accuracy.
+qrcode==8.0  # Generates QR codes for certificate verification links.
+
+# Blockchain
+web3==7.8.0  # Ethereum-compatible chain interaction (store/read certificate hash).
+
+# Configuration and HTTP
+python-dotenv==1.0.1  # Loads environment variables from .env.
+requests==2.32.3  # External HTTP calls (faucet/IPFS/gateway helpers).
+
+# PDF handling
+pymupdf==1.25.5  # Reads PDFs, extracts text/renders pages for OCR pipeline.
+
+# Production serving
+gunicorn==23.0.0  # WSGI HTTP server for deployment.
+whitenoise==6.8.2  # Serves static assets efficiently in production mode.

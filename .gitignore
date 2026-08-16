@@ -1,0 +1,36 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Virtual env
+.venv/
+venv/
+.venv_old*/
+
+# Django/runtime
+*.log
+runtime/staticfiles/*
+!runtime/staticfiles/.gitkeep
+runtime/media/*
+!runtime/media/.gitkeep
+database/db.sqlite3
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local runtime URL cache
+last_public_url.txt
